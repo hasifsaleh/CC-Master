@@ -8,8 +8,17 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from colour import Color
 
-image = Image.open('/Users/amerwafiy/Desktop/cc-monitoring/invoke_logo.jpg')
-st.sidebar.title('Call Centre Monitoring Sytem')
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
+image = Image.open('invoke_logo.jpg')
+st.sidebar.title('Call Centre Performance Tracker 2.0')
 st.sidebar.image(image)
 option1 = st.sidebar.selectbox('Select option', ('Daily', 'Day-to-Day'))
 
@@ -38,7 +47,7 @@ def to_excel(df):
     return processed_data
 
 if option1 == 'Daily':
-    st.image('/Users/amerwafiy/Desktop/cc-monitoring/cc-points.png')
+    st.image('cc-point-system.png')
     number = st.number_input('Select number of campaign(s)', min_value = 1)
     dfs = []
     for i in range(number):
@@ -57,7 +66,7 @@ if option1 == 'Daily':
                 agents = list(a['Agent Username'].unique())
                 dates = list(a['Call Start DT'].unique())
                 if len(dates) > 1:
-                    st.error('Please ONLY upload call logs by day')
+                    st.error('Please ONLY upload call logs from ONE day')
                 else:
                     calls = [len(a[a['Agent Username'] == x]) for x in agents]
                     avg_dur = [sum(a[a['Agent Username'] == x]['Call Dur Connected']) / len(a[a['Agent Username'] == x]) for x in agents]
@@ -80,7 +89,7 @@ if option1 == 'Daily':
                     agents = list(b[col2].unique())
                     dates = list(b[col3].unique())
                     if len(dates) > 1:
-                        st.error('Please ONLY upload call logs by day')
+                        st.error('Please ONLY upload call logs for ONE day')
                     else:
                         if col1 == 'Row counts':
                             df2 = pd.DataFrame({'Agent': list(dict(b[col2].value_counts()).keys()), 'CR': list((b[col2].value_counts())) })
@@ -92,7 +101,7 @@ if option1 == 'Daily':
                         df2 = clean_names(df2, 'Agent')
 
                         if isinstance(a, pd.DataFrame) and isinstance(b, pd.DataFrame):
-                            df = pd.merge(df1,df2,on='Agent',how='left')
+                            df = pd.merge(df1,df2,on='Agent',how='inner')
                             df['Calls Attempted'] = [int(x) if math.isnan(x) == False else 0 for x in df['Calls Attempted']]
                             df['CR'] = [int(x) if math.isnan(x) == False else 0 for x in df['CR']]
                             df['Calls-CR'] = df['Calls Attempted'] - df['CR']
