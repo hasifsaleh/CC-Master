@@ -99,7 +99,7 @@ if option1 == 'Daily':
                             df2 = pd.DataFrame({'Agent': list(dict(b[col2].value_counts()).keys()), 'CR': list((b[col2].value_counts())) })
                         
                         df2 = clean_names(df2, 'Agent')
-
+                        st.table(df2)
                         if isinstance(a, pd.DataFrame) and isinstance(b, pd.DataFrame):
                             df = pd.merge(df1,df2,on='Agent',how='left')
                             df['Calls Attempted'] = [int(x) if math.isnan(x) == False else 0 for x in df['Calls Attempted']]
