@@ -23,6 +23,7 @@ st.sidebar.image(image)
 option1 = st.sidebar.selectbox('Select option', ('Daily', 'Day-to-Day'))
 
 def clean_names(df, col):
+    df[col] = [x.strip() for x in df[col]]
     df[col] = [x.replace('@invokeisdata.com', '') for x in df[col]]
     df[col] = [x.replace('hudahusna', 'huda') for x in df[col]]
     df[col] = [x.replace('amishaa', 'amisha') for x in df[col]]
@@ -86,6 +87,7 @@ if option1 == 'Daily':
                 if col1 != '' and col2 != '' and col3 != '':
                     b[col3] = pd.to_datetime(
                         b[col3], format='%Y/%m/%d').apply(lambda x: dt.datetime.strftime(x, '%d/%m/%Y'))
+                    b[col2] = [x.strip() for x in b[col2]]
                     agents = list(b[col2].unique())
                     dates = list(b[col3].unique())
                     if len(dates) > 1:
