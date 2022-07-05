@@ -48,12 +48,12 @@ def to_excel(df):
     return processed_data
 
 if option1 == 'Daily':
-    st.image('cc-point-system.png')
+    st.image('new-point-system.png')
     number = st.number_input('Select number of campaign(s)', min_value = 1)
     dfs = []
     for i in range(number):
         st.header('SURVEY ' + str(i + 1))
-        cat = st.selectbox('Select survey category', ('', 'A', 'B'), key = str(i) + 'c')
+        cat = st.selectbox('Select survey category', ('', 'A', 'B', 'C', 'D', 'E'), key = str(i) + 'c')
         if cat != '':
             a = st.file_uploader("Upload Call logs (csv)", key = str(i) + 'a')
             if a:
@@ -107,12 +107,18 @@ if option1 == 'Daily':
                             df['Calls Attempted'] = [int(x) if math.isnan(x) == False else 0 for x in df['Calls Attempted']]
                             df['CR'] = [int(x) if math.isnan(x) == False else 0 for x in df['CR']]
                             df['Calls-CR'] = df['Calls Attempted'] - df['CR']
+                        
                             if cat == 'A':
-                                #df['Points'] = (df['Calls-CR'] // 50 * 10) + (df['CR'] * 10)
-                                df['Points'] = (df['Calls-CR'] * 0.2) + (df['CR'] * 10)
-                            else:
-                                #df['Points'] = (df['Calls-CR'] // 80 * 20) + (df['CR'] * 20)
+                                df['Points'] = (df['Calls-CR'] * 10/60) + (df['CR'] * 5)
+                            elif cat == 'B':
+                                df['Points'] = (df['Calls-CR'] * 10/60) + (df['CR'] * 10)
+                            elif cat == 'C':
+                                df['Points'] = (df['Calls-CR'] * 10/50) + (df['CR'] * 10)
+                            elif cat == 'D':
                                 df['Points'] = (df['Calls-CR'] * 0.25) + (df['CR'] * 20)
+                            else:
+                                df['Points'] = (df['Calls-CR'] * 25/80) + (df['CR'] * 25)
+                                                
                             df = df[['Agent', 'Calls Attempted', 'CR', 'Points', 'Average Call Dur (s)']]
                             dfs.append(df)
 
