@@ -8,6 +8,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from colour import Color
 
+# Hide streamlit header and footer
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -23,6 +24,15 @@ st.sidebar.image(image)
 option1 = st.sidebar.selectbox('Select option', ('Daily', 'Day-to-Day'))
 
 def clean_names(df, col):
+    '''
+    Clean CC agent IDs in order to do proper merging as some agents' ARIA ID are not similar to their email ID.
+    Must be updated whenever there's a new agent such that their ARIA ID != email ID
+    
+    df: Whole dataframe [pandas dataframe]
+    col: Column name of CC agent IDs [str]
+    
+    returns dataframe with cleaned names
+    '''
     df[col] = [x.strip() for x in df[col]]
     df[col] = [x.replace('@invokeisdata.com', '') for x in df[col]]
     df[col] = [x.replace('hudahusna', 'huda') for x in df[col]]
@@ -32,10 +42,24 @@ def clean_names(df, col):
     return df
 
 def color_kpi(val):
+    '''
+    Set colour according to whether or not an agent met his or her KPI
+    
+    val: KPI score, O = met, X = unmet
+    
+    returns str of color
+    '''
     color = 'red' if val=='X' else 'green'
     return f'background-color: {color}'
 
 def to_excel(df):
+    '''
+    Create and write excel file
+    
+    df: dataframe [pandas dataframe]
+    
+    returns ready-to-download excel file
+    '''
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     df.to_excel(writer, index=False, sheet_name='Data')
@@ -60,7 +84,6 @@ if option1 == 'Daily':
                 a = pd.read_csv(a, header=5)
                 a = a[a['Dial Leg'] == 'agent']
                 a = a[['Agent Username', 'Call Start DT', 'Call Dur Connected', 'Call Clearing Value']]
-                #a['Call Start DT'] = [x[:10] for x in a['Call Start DT']]
                 a['Call Start DT'] = pd.to_datetime(
                     a['Call Start DT'], format='%Y/%m/%d').apply(lambda x: dt.datetime.strftime(x, '%d/%m/%Y'))
                 a = clean_names(a, 'Agent Username')
